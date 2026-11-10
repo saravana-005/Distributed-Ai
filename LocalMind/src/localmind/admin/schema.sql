@@ -1,0 +1,53 @@
+CREATE TABLE IF NOT EXISTS workers (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    status TEXT NOT NULL DEFAULT 'unknown',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS pairing_codes (
+    id TEXT PRIMARY KEY,
+    code TEXT NOT NULL UNIQUE,
+    worker_id TEXT,
+    expires_at TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(worker_id) REFERENCES workers(id)
+);
+
+CREATE TABLE IF NOT EXISTS datasets (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    path TEXT NOT NULL,
+    rows INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS jobs (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'queued',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS tasks (
+    id TEXT PRIMARY KEY,
+    job_id TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'queued',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(job_id) REFERENCES jobs(id)
+);
+
+CREATE TABLE IF NOT EXISTS events (
+    id TEXT PRIMARY KEY,
+    type TEXT NOT NULL,
+    job_id TEXT,
+    worker_id TEXT,
+    message TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(job_id) REFERENCES jobs(id),
+    FOREIGN KEY(worker_id) REFERENCES workers(id)
+);

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LocalMind Datasets</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="container dashboard">
+      <header class="topbar">
+        <div>
+          <h1>Dataset management</h1>
+          <p class="subtle">Phase 4 safe CSV storage and validation</p>
+        </div>
+        <a href="/dashboard" class="button secondary">Back to dashboard</a>
+      </header>
+
+      <section class="card panel">
+        <h2>Upload dataset</h2>
+        {% if upload_success %}
+        <p class="subtle" role="status">Dataset uploaded successfully.</p>
+        {% endif %}
+        <form method="post" action="/datasets/upload" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+          <input type="file" name="file" accept=".csv,text/csv" required />
+          <button type="submit">Upload CSV</button>
+          <p class="subtle">Maximum size: {{ max_upload_size_bytes }} bytes</p>
+        </form>
+      </section>
+
+      <section class="card panel">
+        <h2>Registered datasets</h2>
+        {% if datasets %}
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Rows</th>
+              <th>Columns</th>
+              <th>Size</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for dataset in datasets %}
+            <tr>
+              <td>{{ dataset.id }}</td>
+              <td>{{ dataset.name }}</td>
+              <td>{{ dataset.rows }}</td>
+              <td>{{ dataset.column_count }}</td>
+              <td>{{ dataset.size_bytes }}</td>
+              <td>{{ dataset.validation_status }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>No datasets uploaded yet.</p>
+        {% endif %}
+      </section>
+    </main>
+  </body>
+</html>

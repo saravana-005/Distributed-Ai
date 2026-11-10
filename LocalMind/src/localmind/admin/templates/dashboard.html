@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LocalMind Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="container dashboard">
+      <header class="topbar">
+        <div>
+          <h1>LocalMind Dashboard</h1>
+          <p class="subtle">Phase 2 worker operations</p>
+        </div>
+        <form method="post" action="/logout">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+          <button type="submit" class="secondary">Log out</button>
+        </form>
+      </header>
+
+      <section class="grid two-up">
+        <div class="card">
+          <h2>System</h2>
+          <ul>
+            <li><strong>Version:</strong> {{ version }}</li>
+            <li><strong>Protocol version:</strong> {{ protocol_version }}</li>
+            <li><strong>Admin status:</strong> {{ admin_status }}</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h2>Network</h2>
+          <ul>
+            <li><strong>Localhost URL:</strong> <a href="{{ localhost_url }}">{{ localhost_url }}</a></li>
+            {% if lan_urls %}
+            <li><strong>LAN URLs:</strong>
+              <ul>
+                {% for url in lan_urls %}
+                <li><a href="{{ url }}">{{ url }}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
+            {% else %}
+            <li><strong>LAN URLs:</strong> None detected</li>
+            {% endif %}
+          </ul>
+        </div>
+      </section>
+
+      <section class="grid two-up">
+        <div class="card panel">
+          <h2>Pairing</h2>
+          <form method="post" action="/dashboard/pair">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+            <button type="submit">Generate pairing code</button>
+          </form>
+          {% if generated_pairing_code %}
+          <div class="pairing-code">
+            <strong>One-time pairing code:</strong>
+            <code>{{ generated_pairing_code }}</code>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="card panel">
+          <h2>Datasets</h2>
+          <p><a href="/datasets">Manage datasets</a></p>
+        </div>
+      </section>
+
+      <section class="grid two-up">
+        <div class="card panel">
+          <h2>Workers</h2>
+          {% if workers %}
+          <ul class="worker-list">
+            {% for worker in workers %}
+            <li>
+              <strong>{{ worker.name }}</strong>
+              <span>({{ worker.id }})</span>
+              <span class="status {{ 'online' if worker.online else 'offline' }}">{{ 'online' if worker.online else 'offline' }}</span>
+              <div>Last heartbeat: {{ worker.last_seen or 'never' }}</div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p>No workers paired yet.</p>
+          {% endif %}
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
